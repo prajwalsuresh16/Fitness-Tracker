@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack Pro - Personal Fitness Tracker</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <!-- PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+    <!-- Story Mode Intro -->
+    <div id="story-intro">
+        <!-- New Live Background -->
+        <div class="story-background">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="field-icon i1"><i class="fa-solid fa-heart-pulse"></i></div>
+            <div class="field-icon i2"><i class="fa-solid fa-dumbbell"></i></div>
+            <div class="field-icon i3"><i class="fa-solid fa-person-running"></i></div>
+            <div class="field-icon i4"><i class="fa-solid fa-bicycle"></i></div>
+        </div>
+
+        <div class="scene-container">
+            <!-- Phase 1: Planning Diet -->
+            <div class="actor-group">
+                <i class="fa-solid fa-person standing-actor"></i>
+                <div class="thought-bubble">
+                    <i class="fa-solid fa-apple-whole food-icon f1"></i>
+                    <i class="fa-solid fa-carrot food-icon f2"></i>
+                    <i class="fa-solid fa-glass-water food-icon f3"></i>
+                </div>
+            </div>
+
+            <!-- Phase 2: Energy -->
+            <div class="energy-effect">
+                <i class="fa-solid fa-bolt lightning"></i>
+            </div>
+
+            <!-- Phase 3: Running -->
+            <div class="runner-group">
+                <i class="fa-solid fa-person-running running-actor"></i>
+                <div class="wind-lines"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Creative Splash Screen -->
+    <div id="splash-screen">
+        <div class="intro-content minimal">
+            <div class="logo-wrapper">
+                <i class="fa-solid fa-bolt neon-pulse"></i>
+            </div>
+            <h1 class="logo-text modern">
+                <span class="letter" style="--delay: 0.1s">F</span>
+                <span class="letter" style="--delay: 0.2s">i</span>
+                <span class="letter" style="--delay: 0.3s">t</span>
+                <span class="letter" style="--delay: 0.4s">T</span>
+                <span class="letter" style="--delay: 0.5s">r</span>
+                <span class="letter" style="--delay: 0.6s">a</span>
+                <span class="letter" style="--delay: 0.7s">c</span>
+                <span class="letter" style="--delay: 0.8s">k</span>
+                <span class="letter spacer">&nbsp;</span>
+                <span class="letter pro-text" style="--delay: 0.9s">P</span>
+                <span class="letter pro-text" style="--delay: 1.0s">r</span>
+                <span class="letter pro-text" style="--delay: 1.1s">o</span>
+            </h1>
+            <div class="loading-bar minimal-bar"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-bolt"></i>
+                <span>FitTrack</span>
+            </div>
+
+            <!-- XP Level System (New) -->
+            <div class="xp-container">
+                <div class="xp-info">
+                    <span class="level-badge">Level <span id="user-level">1</span></span>
+                    <span class="xp-text"><span id="user-xp">0</span> XP <span id="xp-percent"
+                            style="font-size: 0.7em; opacity: 0.6; margin-left: 4px;">(0%)</span></span>
+                </div>
+                <div class="xp-bar-bg">
+                    <div class="xp-bar-fill" id="xp-bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+
+
+            <ul class="nav-links">
+                <li class="active" data-section="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li data-section="workouts">
+                    <i class="fa-solid fa-dumbbell"></i>
+                    <span>Workouts</span>
+                </li>
+                <li data-section="analytics">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Analytics</span>
+                </li>
+                <li data-section="achievements">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span>Achievements</span>
+                </li>
+                <li data-section="nutrition">
+                    <i class="fa-solid fa-utensils"></i>
+                    <span>Nutrition</span>
+                </li>
+                <li data-section="hydration">
+                    <i class="fa-solid fa-glass-water"></i>
+                    <span>Hydration</span>
+                </li>
+                <li data-section="fasting">
+                    <i class="fa-solid fa-stopwatch"></i>
+                    <span>Fasting</span>
+                </li>
+                <li data-section="body-tracker">
+                    <i class="fa-solid fa-person-rays"></i>
+                    <span>Body Status</span>
+                </li>
+                <li data-section="settings">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </li>
+            </ul>
+
+            <div class="theme-toggle">
+                <button id="theme-btn" aria-label="Toggle Dark Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-bar">
+                <button id="mobile-menu-btn" class="mobile-only" aria-label="Toggle Menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 id="page-title">Dashboard</h1>
+                <div class="user-profile" id="profile-dropdown-trigger">
+                    <div class="greeting">Hello, <span id="user-name">User</span></div>
+                    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+
+                    <div class="profile-dropdown">
+
+                        <li id="logout-btn" class="logout-item"><i class="fa-solid fa-right-from-bracket"></i> Logout
+                        </li>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Sections Container -->
+            <div id="content-area">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="active-section">
+                    <!-- Summary Cards -->
+                    <div class="summary-grid">
+                        <div class="card summary-card fire">
+                            <div class="icon"><i class="fa-solid fa-fire"></i></div>
+                            <div class="info">
+                                <h3>Calories Burned</h3>
+                                <p class="value" id="dash-burned">0</p>
+                                <span class="unit">kcal</span>
+                            </div>
+                        </div>
+                        <div class="card summary-card apple">
+                            <div class="icon"><i class="fa-solid fa-carrot"></i></div>
+                            <div class="info">
+                                <h3>Calories Consumed</h3>
+                                <p class="value" id="dash-consumed">0</p>
+                                <span class="unit">of <span id="dash-goal-val">2000</span> kcal</span>
+                            </div>
+                        </div>
+                        <div class="card summary-card balance">
+                            <div class="icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                            <div class="info">
+                                <h3>Net Balance</h3>
+                                <p class="value" id="dash-balance">0</p>
+                                <span class="unit">kcal</span>
+                            </div>
+                            <small id="balance-msg">Perfect!</small>
+                        </div>
+
+                        <!-- Water Card (New) -->
+                        <div class="card summary-card water" id="water-card">
+                            <div class="water-background">
+                                <div class="wave wave-1"></div>
+                                <div class="wave wave-2"></div>
+                            </div>
+                            <div class="water-content">
+                                <div class="icon"><i class="fa-solid fa-glass-water"></i></div>
+                                <div class="info">
+                                    <h3>Hydration Level</h3>
+                                    <p class="value"><span id="water-count">0</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="charts-grid">
+                        <div class="card chart-card large">
+                            <div class="card-header">
+                                <h3>Activity Progress</h3>
+                                <select id="chart-period">
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <div class="chart-card-body">
+                                <canvas id="mainChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card chart-card small">
+                            <div class="card-header">
+                                <h3>Macro Breakdown</h3>
+                            </div>
+                            <div class="chart-card-body">
+                                <canvas id="macroChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div class="recommendations-area" id="recommendations">
+                        <!-- Dynamic content injected here -->
+                    </div>
+                </section>
+
+                <!-- Hydration Section (New) -->
+                <section id="hydration" class="hidden-section">
+                    <div class="section-header">
+                        <h2>Hydration Log</h2>
+                    </div>
+
+                    <div class="hydration-dashboard">
+                        <!-- Big Circle Progress -->
+                        <div class="card hydration-main-card">
+                            <div class="water-glass-container">
+                                <div class="glass-visual">
+                                    <div class="water-fill" id="water-fill-level"></div>
+                                </div>
+                                <div class="glass-overlay">
+                                    <div class="glass-info">
+                                        <i class="fa-solid fa-glass-water"></i>
+                                        <span id="hydration-glass-val">0 / 2500ml</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hydration-actions">
+                                <button class="btn btn-primary water-action-btn" data-action="add" data-amount="250">
+                                    <i class="fa-solid fa-plus"></i> 250ml
+                                </button>
+                                <button class="btn btn-primary water-action-btn" data-action="add" data-amount="500">
+                                    <i class="fa-solid fa-plus"></i> 500ml
+                                </button>
+                                <button class="btn btn-outline water-action-btn" data-action="remove">
+                                    <i class="fa-solid fa-minus"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Workouts Section -->
+                <section id="workouts" class="hidden-section">
+                    <!-- Hero Section -->
+                    <div class="workout-hero">
+                        <div class="hero-content">
+                            <h2><i class="fa-solid fa-heart-pulse heartbeat"></i> Today's Pulse</h2>
+                            <div class="workout-stats-row">
+                                <div class="stat-bubble" id="bubble-active-min">
+                                    <i class="fa-solid fa-stopwatch"></i>
+                                    <div class="stat-info">
+                                        <span class="stat-val" id="today-active-min">0</span>
+                                        <span class="stat-label">Active Min</span>
+                                    </div>
+                                </div>
+                                <div class="stat-bubble" id="bubble-burned-cal">
+                                    <i class="fa-solid fa-fire"></i>
+                                    <div class="stat-info">
+                                        <span class="stat-val" id="today-workout-cal">0</span>
+                                        <span class="stat-label">Kcal Burned</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hero-action">
+                            <button class="btn btn-primary pulse-btn" id="add-workout-btn">
+                                <i class="fa-solid fa-plus"></i> Log Activity
+                            </button>
+                        </div>
+                    </div>
+                    <div class="timeline-container" id="workout-list">
+                        <!-- Workout items injected here -->
+                        <div class="empty-state">
+                            <i class="fa-solid fa-person-running"></i>
+                            <p>No workouts logged yet</p>
+                            <small>Get moving and track your progress!</small>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Nutrition Section -->
+                <section id="nutrition" class="hidden-section">
+                    <!-- Hero Section -->
+                    <div class="nutrition-hero">
+                        <div class="macro-overview">
+                            <div class="macro-ring-container">
+                                <!-- Protein -->
+                                <div class="macro-ring" style="--c: #ef4444;" id="ring-protein">
+                                    <div class="ring-center"><i class="fa-solid fa-drumstick-bite"></i></div>
+                                    <span class="ring-label">Protein</span>
+                                </div>
+                                <!-- Carbs -->
+                                <div class="macro-ring" style="--c: #3b82f6;" id="ring-carbs">
+                                    <div class="ring-center"><i class="fa-solid fa-bread-slice"></i></div>
+                                    <span class="ring-label">Carbs</span>
+                                </div>
+                                <!-- Fats -->
+                                <div class="macro-ring" style="--c: #eab308;" id="ring-fats">
+                                    <div class="ring-center"><i class="fa-solid fa-cheese"></i></div>
+                                    <span class="ring-label">Fats</span>
+                                </div>
+                            </div>
+                            <div class="nutrition-summary">
+                                <h3>Today's Fuel</h3>
+                                <div class="fuel-stats">
+                                    <span id="today-consumed-hero">0</span> <small>kcal</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hero-action">
+                            <button class="btn btn-primary" id="add-meal-btn">
+                                <i class="fa-solid fa-plus"></i> Log Meal
+                            </button>
+                        </div>
+                    </div>
+                    <div class="timeline-container" id="meal-list">
+                        <!-- Meal items injected here -->
+                        <div class="empty-state">
+                            <i class="fa-solid fa-utensils"></i>
+                            <p>No meals logged yet</p>
+                            <small>Track your nutrition to reach your goals!</small>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Fasting Section (New) -->
+                <section id="fasting" class="hidden-section">
+                    <div class="section-header">
+                        <h2>Fasting Timer</h2>
+                        <div class="date-display" id="fasting-date"></div>
+                    </div>
+
+                    <div class="fasting-container">
+                        <!-- Gradient Clock Container -->
+                        <div class="clock-container">
+                            <div class="clock-visual">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div class="clock-overlay">
+                                <div class="clock-stat">
+                                    <small>Elapsed</small>
+                                    <div id="timer-display">00:00:00</div>
+                                </div>
+                                <div class="clock-stat remaining">
+                                    <small>Remaining</small>
+                                    <div id="timer-remaining">00:00:00</div>
+                                </div>
+                                <div id="fasting-status">Not Fasting</div>
+                            </div>
+                        </div>
+
+                        <!-- Controls -->
+                        <div class="fasting-controls">
+                            <div class="goal-selector">
+                                <label for="fast-goal">Goal:</label>
+                                <select id="fast-goal">
+                                    <option value="13">13 Hours (Circadian)</option>
+                                    <option value="16" selected>16 Hours (16:8)</option>
+                                    <option value="18">18 Hours (18:6)</option>
+                                    <option value="20">20 Hours (Warrior)</option>
+                                    <option value="24">24 Hours (OMAD)</option>
+                                </select>
+                            </div>
+
+                            <button id="start-fast-btn" class="btn-primary-large">
+                                <i class="fa-solid fa-play"></i> Start Fast
+                            </button>
+                            <button id="end-fast-btn" class="btn-danger-large hidden">
+                                <i class="fa-solid fa-stop"></i> End Fast
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- History -->
+                    <div class="fasting-history-container">
+                        <h3>Recent Fasts</h3>
+                        <ul id="fasting-history-list">
+                            <!-- Populated by JS -->
+                            <li class="empty-msg">No completed fasts yet.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Analytics Section -->
+                <!-- Analytics Section -->
+                <section id="analytics" class="section hidden-section">
+                    <div class="section-header">
+                        <h1>Analytics & Trends</h1>
+                        <p class="subtitle">Your consistency visualized</p>
+                    </div>
+
+                    <!-- Fire Hero -->
+                    <div class="fire-hero-container" style="display: flex; justify-content: center; margin: 2rem 0;">
+                        <div class="fire-card">
+                            <div class="fire-visual-wrapper">
+                                <i class="fa-solid fa-fire fire-icon-large"></i>
+                            </div>
+                            <div class="fire-overlay">
+                                <span class="fire-count" id="analytics-streak-val">0</span>
+                                <span class="fire-label">Day Streak</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2x2 Grid -->
+                    <div class="analytics-grid"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                        <div class="card chart-card">
+                            <h3>Calories Burned</h3>
+                            <canvas id="chart-burned-weekly"></canvas>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Calories Consumed</h3>
+                            <canvas id="chart-consumed-weekly"></canvas>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Hydration History</h3>
+                            <canvas id="chart-water-weekly"></canvas>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Streak Growth</h3>
+                            <canvas id="chart-streak-weekly"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Achievements Section -->
+                <section id="achievements" class="section hidden-section">
+                    <div class="section-header">
+                        <h1>Your Trophy Room</h1>
+                        <p class="subtitle">Collect them all!</p>
+                    </div>
+
+                    <!-- Cupboard (Earned) -->
+                    <div class="cupboard-container">
+                        <div class="cupboard-header">Earned Badges <small>(Hover to Open)</small></div>
+                        <div class="cupboard">
+                            <div class="door left">
+                                <div class="handle"></div>
+                                <div class="door-panel"></div>
+                            </div>
+                            <div class="door right">
+                                <div class="handle"></div>
+                                <div class="door-panel"></div>
+                            </div>
+                            <div class="shelves" id="earned-shelf">
+                                <!-- Unlocked Badges Go Here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Locked Grid -->
+                    <div class="locked-badges-container" style="margin-top: 3rem;">
+                        <h3>Locked Achievements</h3>
+                        <div id="unearned-grid" class="badge-grid">
+                            <!-- Locked Badges Go Here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settings" class="hidden-section">
+                    <div class="settings-header">
+                        <h2>Settings & Profile</h2>
+                    </div>
+
+                    <div class="profile-grid">
+                        <!-- Left: Identity Card -->
+                        <div class="card profile-card">
+                            <div class="profile-avatar-large">
+                                <i class="fa-solid fa-user-astronaut"></i>
+                            </div>
+                            <h3 id="profile-name-display">User</h3>
+                            <div class="profile-meta">
+                                <span class="badge-pill">Level <span id="profile-level-display">1</span></span>
+                                <span class="join-date" id="profile-join-date">Member since 2024</span>
+                            </div>
+
+                            <!-- Edit Name UI -->
+                            <button id="btn-toggle-edit-name" class="btn-text-sm"
+                                style="margin-top:1rem; font-size: 0.9rem; opacity:0.8; background:none; border:none; color:var(--text-primary); cursor:pointer;">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit Name
+                            </button>
+                            <div id="edit-name-panel" class="hidden" style="margin-top:1rem; width:100%;">
+                                <div style="display:flex; gap:0.5rem; justify-content: center;">
+                                    <input type="text" id="input-display-name" placeholder="Name"
+                                        style="padding:0.5rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-body); color:var(--text-primary); width: 140px;">
+                                    <button id="btn-save-name" class="btn btn-primary"
+                                        style="padding:0.5rem 0.8rem; border-radius:8px;">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Goals Form -->
+                        <div class="card goal-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-bullseye"></i> Physical Goals</h3>
+                            </div>
+                            <form id="goals-form">
+                                <div class="form-grid">
+                                    <div class="input-group">
+                                        <label><i class="fa-solid fa-weight-scale"></i> Current Weight (kg)</label>
+                                        <input type="number" id="current-weight" value="0" step="0.1">
+                                    </div>
+                                    <div class="input-group">
+                                        <label><i class="fa-solid fa-flag-checkered"></i> Target Weight (kg)</label>
+                                        <input type="number" id="goal-weight" value="70" step="0.1">
+                                    </div>
+                                    <div class="input-group full-width">
+                                        <label><i class="fa-solid fa-fire"></i> Daily Calorie Goal</label>
+                                        <input type="number" id="goal-calories" value="2000">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary save-btn">
+                                    <i class="fa-solid fa-floppy-disk"></i> Update Profile
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Full Width: Weight Chart -->
+                        <div class="card chart-card-wide">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-chart-line"></i> Weight Journey</h3>
+                            </div>
+                            <div class="chart-container-large">
+                                <canvas id="weightChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Data Actions -->
+                        <div class="card data-card">
+                            <h3><i class="fa-solid fa-database"></i> Data Control</h3>
+                            <div class="data-actions">
+                                <button id="btn-export-csv" class="btn btn-outline">
+                                    <i class="fa-solid fa-file-csv"></i> Export CSV
+                                </button>
+                                <button id="btn-export-pdf" class="btn btn-outline">
+                                    <i class="fa-solid fa-file-pdf"></i> Export PDF
+                                </button>
+                                <button id="btn-reset-data" class="btn btn-danger">
+                                    <i class="fa-solid fa-trash-can"></i> Reset All Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                </section>
+
+                <!-- Holo-Body Section -->
+                <section id="body-tracker" class="hidden-section">
+                    <div class="tracker-header" style="text-align:center; margin-bottom:2rem;">
+                        <h2
+                            style="font-size:2rem; background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                            Holo-Body Status</h2>
+                        <p style="color:var(--text-secondary);">Live Calorie Visualization</p>
+                    </div>
+
+                    <div class="holo-container"
+                        style="position:relative; height:600px; display:flex; justify-content:center; align-items:center;">
+
+                        <!-- Edit Bio-Core Button (Phase 9) -->
+                        <button id="btn-edit-bio" class="action-btn" title="Update Bio-Metrics"
+                            style="position:absolute; top:20px; right:20px; z-index:101; background:rgba(15, 23, 42, 0.8); border:1px solid #4facfe; border-radius:50%; width:40px; height:40px; color:#fff; cursor:pointer; box-shadow:0 0 10px rgba(79, 172, 254, 0.3); display:flex; justify-content:center; align-items:center; transition:all 0.3s ease;">
+                            <i class="fa-solid fa-sliders"></i>
+                        </button>
+
+                        <!-- 3D Glass Mannequin SVG -->
+                        <svg width="300" height="550" viewBox="0 0 200 400" id="holo-body-svg"
+                            style="filter: drop-shadow(0 0 20px rgba(79, 172, 254, 0.4));">
+                            <defs>
+                                <!-- Glossy Glass Gradient -->
+                                <linearGradient id="glass-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="rgba(255,255,255,0.4)" />
+                                    <stop offset="50%" stop-color="rgba(255,255,255,0.1)" />
+                                    <stop offset="100%" stop-color="rgba(255,255,255,0.05)" />
+                                </linearGradient>
+
+                                <!-- Fluid Gradient -->
+                                <linearGradient id="fluid-grad" x1="0%" y1="100%" x2="0%" y2="0%">
+                                    <stop offset="0%" stop-color="#00f2fe" />
+                                    <stop offset="100%" stop-color="#4facfe" />
+                                </linearGradient>
+
+                                <!-- Shared Body Shape (Defined for Outline/Glass) -->
+                                <g id="mannequin-shape">
+                                    <!-- Head -->
+                                    <circle cx="100" cy="35" r="25" />
+                                    <!-- Torso -->
+                                    <rect x="70" y="65" width="60" height="100" rx="15" />
+                                    <!-- Arms -->
+                                    <rect x="40" y="70" width="20" height="110" rx="10" />
+                                    <rect x="140" y="70" width="20" height="110" rx="10" />
+                                    <!-- Legs -->
+                                    <rect x="70" y="170" width="25" height="140" rx="10" />
+                                    <rect x="105" y="170" width="25" height="140" rx="10" />
+                                </g>
+
+                                <!-- Clip Path (Geometry INLINED for maximum compatibility) -->
+                                <clipPath id="body-clip">
+                                    <circle cx="100" cy="35" r="25" />
+                                    <rect x="70" y="65" width="60" height="100" rx="15" />
+                                    <rect x="40" y="70" width="20" height="110" rx="10" />
+                                    <rect x="140" y="70" width="20" height="110" rx="10" />
+                                    <rect x="70" y="170" width="25" height="140" rx="10" />
+                                    <rect x="105" y="170" width="25" height="140" rx="10" />
+                                </clipPath>
+                            </defs>
+
+                            <!-- Background Shell (Glass) -->
+                            <use href="#mannequin-shape" fill="url(#glass-grad)" stroke="rgba(255,255,255,0.3)"
+                                stroke-width="2" />
+
+                            <!-- Fluid Fill (Clipped) -->
+                            <g clip-path="url(#body-clip)">
+                                <!-- The Fluid Rect: Height changes dynamically -->
+                                <rect id="fluid-fill" x="0" y="400" width="200" height="0" fill="url(#fluid-grad)"
+                                    style="transition: height 1s cubic-bezier(0.4, 0.0, 0.2, 1), y 1s cubic-bezier(0.4, 0.0, 0.2, 1);" />
+                                <!-- Wave Effect (Overlay) could go here -->
+                            </g>
+
+                            <!-- Outline Overlay -->
+                            <use href="#mannequin-shape" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" />
+
+                            <!-- Internal Muscle Lines (Optional Detail) -->
+                            <path d="M 100,65 L 100,165" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                            <path d="M 70,165 L 130,165" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                        </svg>
+
+                        <!-- HUD Panels (Phase 7) -->
+                        <div class="hud-panel left-panel">
+                            <div class="hud-metric">
+                                <span class="label">BMI</span>
+                                <span class="value" id="hud-bmi">--</span>
+                                <span class="sub-text" id="hud-bmi-cat">Calculated</span>
+                            </div>
+                            <div class="hud-metric">
+                                <span class="label">Weight</span>
+                                <span class="value" id="hud-weight">--</span>
+                                <span class="sub-text">kg</span>
+                            </div>
+                        </div>
+
+                        <div class="hud-panel right-panel">
+                            <div class="hud-metric">
+                                <span class="label">BMR</span>
+                                <span class="value" id="hud-bmr">--</span>
+                                <span class="sub-text">kcal/day</span>
+                            </div>
+                            <div class="hud-metric">
+                                <span class="label">TDEE</span>
+                                <span class="value" id="hud-tdee">--</span>
+                                <span class="sub-text">Maintenance</span>
+                            </div>
+                        </div>
+
+
+                        <!-- Phase 8: Bio-Metrics Input Form -->
+                        <div id="bio-input-overlay" class="glass-panel"
+                            style="position:absolute; bottom:20%; left:50%; transform:translateX(-50%); width:90%; max-width:400px; padding:1.5rem; display:flex; flex-direction:column; gap:1rem; z-index:9999;">
+                            <h3 style="text-align:center; color:#fff; margin:0;">Bio-Core Activation</h3>
+                            <div style="display:flex; justify-content:space-between; gap:10px;">
+                                <input type="number" id="bio-age" placeholder="Age"
+                                    style="width:100%; padding:10px; border-radius:8px; border:none; background:rgba(255,255,255,0.1); color:#fff;">
+                                <select id="bio-gender"
+                                    style="width:100%; padding:10px; border-radius:8px; border:none; background:rgba(255,255,255,0.1); color:#fff;">
+                                    <option value="male" style="color:#000;">Male</option>
+                                    <option value="female" style="color:#000;">Female</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; gap:10px;">
+                                <input type="number" id="bio-height" placeholder="Height (cm)"
+                                    style="width:100%; padding:10px; border-radius:8px; border:none; background:rgba(255,255,255,0.1); color:#fff;">
+                                <input type="number" id="bio-weight" placeholder="Weight (kg)"
+                                    style="width:100%; padding:10px; border-radius:8px; border:none; background:rgba(255,255,255,0.1); color:#fff;">
+                            </div>
+                            <button id="btn-activate-hud" class="btn btn-primary"
+                                style="width:100%; margin-top:10px; box-shadow:0 0 15px #4facfe;">
+                                <i class="fa-solid fa-power-off"></i> Activate System
+                            </button>
+                        </div>
+
+
+
+                        <!-- Dynamic Labels Container -->
+                        <div id="body-labels"
+                            style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;">
+                            <!-- JS will inject labels here interactively -->
+                            <div id="label-active" class="holo-label hidden"
+                                style="position:absolute; top:50%; left:70%; transform:translateY(-50%);">
+                                <div class="line"
+                                    style="width:50px; height:2px; background:#fff; display:inline-block; vertical-align:middle;">
+                                </div>
+                                <span
+                                    style="background:rgba(0,0,0,0.8); padding:5px 10px; border-radius:5px; border:1px solid #4facfe;">Test
+                                    Label</span>
+                            </div>
+                        </div>
+
+                        <!-- Stats Overlay -->
+                        <div style="position:absolute; bottom:20px; text-align:center;">
+                            <h3 id="holo-cal-display" style="font-size:1.5rem; text-shadow:0 2px 10px rgba(0,0,0,0.8);">
+                                0 / 2500</h3>
+                            <small style="color:#4facfe;">Net Calories</small>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Login Screen -->
+                <div id="login-screen">
+                    <div class="login-card">
+                        <div class="logo-wrapper small">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <div class="auth-tabs">
+                            <button class="auth-tab active" data-tab="login">Sign In</button>
+                            <button class="auth-tab" data-tab="signup">Sign Up</button>
+                        </div>
+
+                        <!-- Login View -->
+                        <div id="auth-login" class="auth-view active">
+                            <h2>Welcome Back</h2>
+                            <p class="subtitle">Enter your profile name to continue</p>
+
+                            <form id="login-form" class="signup-form">
+                                <input type="text" id="login-username" placeholder="Username" required>
+                                <input type="password" id="login-password" placeholder="Password" required>
+                                <button type="submit" class="btn btn-primary full-width">
+                                    Sign In <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Signup View -->
+                        <div id="auth-signup" class="auth-view">
+                            <h2>Create Account</h2>
+                            <p class="subtitle">Join the fitness journey</p>
+                            <form id="signup-form" class="signup-form">
+                                <input type="text" id="reg-username" placeholder="Choose a Username" required>
+                                <input type="password" id="reg-password" placeholder="Create Password" required>
+                                <div class="form-row">
+                                    <input type="number" id="reg-weight" placeholder="Weight (kg)" required>
+                                    <input type="number" id="reg-goal" placeholder="Daily Goal (kcal)" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary full-width">
+                                    Register & Login <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modals -->
+                <div id="notification-container"></div>
+                <div id="workout-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-modal">&times;</span>
+                        <h2>Log Workout</h2>
+                        <form id="workout-form">
+                            <div class="form-group">
+                                <label>Activity Type</label>
+                                <select id="w-type" required>
+                                    <option value="running">Running</option>
+                                    <option value="cycling">Cycling</option>
+                                    <option value="weightlifting">Weightlifting</option>
+                                    <option value="yoga">Yoga</option>
+                                    <option value="hiit">HIIT</option>
+                                    <option value="swimming">Swimming</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Duration (minutes)</label>
+                                <input type="number" id="w-duration" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label id="w-param-label">Distance (km)</label>
+                                <input type="number" id="w-param" min="0" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Intensity (Auto-Detected)</label>
+                                <div class="intensity-selector">
+                                    <label><input type="radio" name="intensity" value="light"> Light</label>
+                                    <label><input type="radio" name="intensity" value="moderate" checked>
+                                        Moderate</label>
+                                    <label><input type="radio" name="intensity" value="high"> High</label>
+                                </div>
+                                <small id="intensity-hint">Auto-detected based on type/duration</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Calories Burned (Estimated)</label>
+                                <input type="number" id="w-calories" readonly>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Log Activity</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="meal-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-modal">&times;</span>
+                        <h2>Log Meal</h2>
+                        <form id="meal-form">
+                            <div class="form-group">
+                                <label>Meal Name</label>
+                                <input type="text" id="m-name" placeholder="e.g., Oatmeal & Banana" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Calories</label>
+                                <input type="number" id="m-calories" min="0" required>
+                            </div>
+                            <div class="macros-grid">
+                                <div class="form-group">
+                                    <label>Protein (g)</label>
+                                    <input type="number" id="m-protein" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Carbs (g)</label>
+                                    <input type="number" id="m-carbs" min="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Fats (g)</label>
+                                    <input type="number" id="m-fats" min="0">
+                                </div>
+                            </div>
+                            <div id="meal-warnings" class="warnings-area"></div>
+                            <button type="submit" class="btn btn-primary">Log Meal</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Smart Focus Overlay -->
+                <div id="focus-overlay">
+                    <div class="focus-card">
+                        <!-- Icon Section -->
+                        <div class="focus-icon-wrapper">
+                            <i id="focus-icon" class="fa-solid fa-fire"></i>
+                        </div>
+
+                        <!-- Content Section -->
+                        <div class="focus-content">
+                            <h2 id="focus-title">Calories Burned</h2>
+
+                            <div class="focus-stats">
+                                <span id="focus-value" class="big-value">0</span>
+                                <span id="focus-unit" class="unit">kcal</span>
+                            </div>
+
+                            <!-- Guidance / Suggestions -->
+                            <div class="focus-guidance">
+                                <h4 id="focus-suggestion-title">Action Plan</h4>
+                                <p id="focus-suggestion-text">Loading suggestion...</p>
+                                <div id="focus-action-items" class="action-items">
+                                    <!-- Dynamic items like specific workouts or food -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cinematic Badge Spotlight (Hover) -->
+                <div id="badge-spotlight">
+                    <div class="spotlight-backdrop"></div>
+                    <div class="spotlight-content">
+                        <div id="spot-icon-wrapper" class="spot-icon-wrapper">
+                            <i id="spot-icon" class="fa-solid fa-trophy"></i>
+                        </div>
+                        <div class="spot-text">
+                            <h2 id="spot-status">Congratulations!</h2>
+                            <h1 id="spot-title">Badge Name</h1>
+                            <p id="spot-desc">You earned this by doing...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scripts -->
+                <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+                <script src="js/storage.js"></script>
+                <script src="js/auth.js"></script>
+                <script src="js/theme.js"></script>
+                <script src="js/calculator.js"></script>
+                <script src="js/recommendations.js"></script>
+                <script src="js/charts.js"></script>
+                <script src="js/live-workout.js"></script>
+                <script src="js/auth.js"></script>
+                <script src="js/ui.js?v=holo2"></script>
+                <script src="js/fasting.js"></script>
+                <script src="js/app.js?v=holo2"></script>
+</body>
+
+</html>
