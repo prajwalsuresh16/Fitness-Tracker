@@ -136,6 +136,10 @@
                     <i class="fa-solid fa-person-rays"></i>
                     <span>Body Status</span>
                 </li>
+                <li data-section="recovery">
+                    <i class="fa-solid fa-spa"></i>
+                    <span>Recovery</span>
+                </li>
                 <li data-section="settings">
                     <i class="fa-solid fa-gear"></i>
                     <span>Settings</span>
@@ -656,16 +660,51 @@
                             <use href="#mannequin-shape" fill="url(#glass-grad)" stroke="rgba(255,255,255,0.3)"
                                 stroke-width="2" />
 
+                            <!-- Interactive Muscle Map -->
+                            <g id="muscle-map" style="cursor: pointer;">
+                                <!-- Each group can have its own heat intensity via JS -->
+                                <g id="muscle-chest" class="muscle-group" data-muscle="Chest">
+                                    <path d="M 80,75 L 120,75 L 120,105 L 80,105 Z" />
+                                </g>
+                                <g id="muscle-abs" class="muscle-group" data-muscle="Abs">
+                                    <path d="M 85,110 L 115,110 L 115,155 L 85,155 Z" />
+                                </g>
+                                <g id="muscle-shoulders-l" class="muscle-group" data-muscle="Shoulders">
+                                    <path d="M 40,70 Q 40,65 70,65 L 75,85 L 45,85 Z" />
+                                </g>
+                                <g id="muscle-shoulders-r" class="muscle-group" data-muscle="Shoulders">
+                                    <path d="M 130,65 Q 160,65 160,70 L 155,85 L 125,85 Z" />
+                                </g>
+                                <g id="muscle-back-l" class="muscle-group" data-muscle="Back">
+                                    <path d="M 70,75 L 80,75 L 80,165 L 70,155 Z" />
+                                </g>
+                                <g id="muscle-back-r" class="muscle-group" data-muscle="Back">
+                                    <path d="M 120,75 L 130,75 L 130,155 L 120,165 Z" />
+                                </g>
+                                <g id="muscle-arms-l" class="muscle-group" data-muscle="Arms">
+                                    <rect x="40" y="85" width="20" height="95" rx="10" />
+                                </g>
+                                <g id="muscle-arms-r" class="muscle-group" data-muscle="Arms">
+                                    <rect x="140" y="85" width="20" height="95" rx="10" />
+                                </g>
+                                <g id="muscle-legs-l" class="muscle-group" data-muscle="Legs">
+                                    <rect x="70" y="170" width="25" height="140" rx="10" />
+                                </g>
+                                <g id="muscle-legs-r" class="muscle-group" data-muscle="Legs">
+                                    <rect x="105" y="170" width="25" height="140" rx="10" />
+                                </g>
+                            </g>
+
                             <!-- Fluid Fill (Clipped) -->
-                            <g clip-path="url(#body-clip)">
+                            <g clip-path="url(#body-clip)" style="pointer-events: none;">
                                 <!-- The Fluid Rect: Height changes dynamically -->
                                 <rect id="fluid-fill" x="0" y="400" width="200" height="0" fill="url(#fluid-grad)"
                                     style="transition: height 1s cubic-bezier(0.4, 0.0, 0.2, 1), y 1s cubic-bezier(0.4, 0.0, 0.2, 1);" />
-                                <!-- Wave Effect (Overlay) could go here -->
                             </g>
 
                             <!-- Outline Overlay -->
-                            <use href="#mannequin-shape" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" />
+                            <use href="#mannequin-shape" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"
+                                style="pointer-events: none;" />
 
                             <!-- Internal Muscle Lines (Optional Detail) -->
                             <path d="M 100,65 L 100,165" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
@@ -751,6 +790,60 @@
                     </div>
                 </section>
 
+                <section id="recovery" class="hidden-section">
+                    <div class="zen-container">
+                        <div class="zen-card">
+                            <div class="zen-card-header">
+                                <i class="fa-solid fa-spa zen-icon-main"></i>
+                                <h1 class="zen-title">Spirit Recovery</h1>
+                                <p class="zen-subtitle">Focus your mind, synchronize your breath, earn XP.</p>
+                            </div>
+
+                            <div class="zen-layout">
+                                <div class="zen-visual-zone">
+                                    <div class="breathing-sphere-outer">
+                                        <div class="breathing-sphere" id="zen-sphere">
+                                            <div class="sphere-glow"></div>
+                                        </div>
+                                        <div class="sphere-label" id="zen-instruction">READY</div>
+                                    </div>
+                                </div>
+
+                                <div class="zen-info-pane">
+                                    <div class="zen-stat-box">
+                                        <span class="stat-label">Total Zen Time</span>
+                                        <span class="stat-value" id="zen-total-time">0m</span>
+                                    </div>
+                                    <div class="zen-stat-box session">
+                                        <span class="stat-label">Current Session</span>
+                                        <span class="stat-value" id="zen-session-timer">00:00</span>
+                                    </div>
+
+                                    <div class="zen-controls-modern">
+                                        <button id="start-zen-btn" class="zen-main-btn start">
+                                            <i class="fa-solid fa-play"></i> START SESSION
+                                        </button>
+                                        <button id="stop-zen-btn" class="zen-main-btn stop hidden">
+                                            <i class="fa-solid fa-stop"></i> STOP SESSION
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="zen-footer-modern">
+                                <div class="rhythm-wrapper">
+                                    <span class="rhythm-label">Breathing Rhythm</span>
+                                    <div class="rhythm-chips">
+                                        <div class="rhythm-chip active" data-rhythm="box">BOX (4s)</div>
+                                        <div class="rhythm-chip" data-rhythm="relax">RELAX (4-7-8)</div>
+                                        <div class="rhythm-chip" data-rhythm="calm">CALM (5s)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Login Screen -->
                 <div id="login-screen">
                     <div class="login-card">
@@ -788,11 +881,17 @@
                                     <input type="number" id="reg-goal" placeholder="Daily Goal (kcal)" required>
                                 </div>
                                 <button type="submit" class="btn btn-primary full-width">
-                                    Register & Login <i class="fa-solid fa-arrow-right"></i>
+                                    Create Account <i class="fa-solid fa-arrow-right"></i>
                                 </button>
                             </form>
                         </div>
                     </div>
+                </div>
+
+                <!-- Floating Voice Assistant Button -->
+                <div id="voice-assistant-trigger" class="voice-btn" title="Activate Ghost Assistant">
+                    <i class="fa-solid fa-microphone"></i>
+                    <div class="pulse-ring"></div>
                 </div>
 
                 <!-- Modals -->
@@ -805,12 +904,45 @@
                             <div class="form-group">
                                 <label>Activity Type</label>
                                 <select id="w-type" required>
-                                    <option value="running">Running</option>
-                                    <option value="cycling">Cycling</option>
-                                    <option value="weightlifting">Weightlifting</option>
-                                    <option value="yoga">Yoga</option>
-                                    <option value="hiit">HIIT</option>
-                                    <option value="swimming">Swimming</option>
+                                    <optgroup label="Abs">
+                                        <option value="core">Core Workout</option>
+                                        <option value="crunch">Crunch</option>
+                                        <option value="leg raises">Leg Raises</option>
+                                        <option value="pilates">Pilates</option>
+                                        <option value="plank">Plank</option>
+                                        <option value="yoga">Yoga</option>
+                                    </optgroup>
+                                    <optgroup label="Arms">
+                                        <option value="bicep curl">Bicep Curl</option>
+                                        <option value="pullups">Pullups</option>
+                                        <option value="rows">Rows</option>
+                                        <option value="tricep extension">Tricep Extension</option>
+                                        <option value="weightlifting">Weightlifting</option>
+                                    </optgroup>
+                                    <optgroup label="Cardio">
+                                        <option value="burpees">Burpees</option>
+                                        <option value="cycling">Cycling</option>
+                                        <option value="hiit">HIIT</option>
+                                        <option value="jumping jacks">Jumping Jacks</option>
+                                        <option value="running">Running</option>
+                                        <option value="swimming">Swimming</option>
+                                        <option value="walking">Walking</option>
+                                        <option value="zumba">Zumba</option>
+                                    </optgroup>
+                                    <optgroup label="Chest">
+                                        <option value="bench press">Bench Press</option>
+                                        <option value="chest fly">Chest Fly</option>
+                                        <option value="pushups">Pushups</option>
+                                    </optgroup>
+                                    <optgroup label="Legs">
+                                        <option value="deadlift">Deadlift</option>
+                                        <option value="lunges">Lunges</option>
+                                        <option value="squats">Squats</option>
+                                    </optgroup>
+                                    <optgroup label="Shoulders">
+                                        <option value="lateral raise">Lateral Raise</option>
+                                        <option value="overhead press">Overhead Press</option>
+                                    </optgroup>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -926,10 +1058,11 @@
                 <script src="js/recommendations.js"></script>
                 <script src="js/charts.js"></script>
                 <script src="js/live-workout.js"></script>
-                <script src="js/auth.js"></script>
-                <script src="js/ui.js?v=holo2"></script>
                 <script src="js/fasting.js"></script>
-                <script src="js/app.js?v=holo2"></script>
+                <script src="js/recovery.js"></script>
+                <script src="js/ui.js"></script>
+                <script src="js/voice-assistant.js"></script>
+                <script src="js/app.js"></script>
 </body>
 
 </html>

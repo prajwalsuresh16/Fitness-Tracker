@@ -12,12 +12,15 @@ class UIManager {
         waterBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const action = e.currentTarget.dataset.action; // 'add' or 'remove'
-                const amount = parseInt(e.currentTarget.dataset.amount || 0);
+                let amount = parseInt(e.currentTarget.dataset.amount);
+
+                // Fallback for remove button if no amount specified
+                if (isNaN(amount)) amount = 250;
 
                 if (action === 'add') {
                     this.app.addWater(amount);
                 } else if (action === 'remove') {
-                    this.app.removeWater();
+                    this.app.removeWater(amount);
                 }
             });
         });
@@ -118,6 +121,25 @@ class UIManager {
                 e.target.reset();
             }
         });
+
+        // Smart Nutrition Analysis Listener
+        const mNameInput = document.getElementById('m-name');
+        if (mNameInput) {
+            mNameInput.addEventListener('input', (e) => {
+                const query = e.target.value;
+                if (query.length > 2) {
+                    const result = this.app.calc.analyzeFood(query);
+
+                    // Auto-fill fields if we found a match (confidence > 0.5)
+                    if (result.confidence > 0.5) {
+                        document.getElementById('m-calories').value = result.calories;
+                        document.getElementById('m-protein').value = result.protein;
+                        document.getElementById('m-carbs').value = result.carbs;
+                        document.getElementById('m-fats').value = result.fats;
+                    }
+                }
+            });
+        }
 
         document.getElementById('goals-form').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -1287,10 +1309,6 @@ class UIManager {
         const percentage = Math.min(1, net / goal);
 
         // SVG Metrics Corrected for Feet position
-        // Body Feet y = 310. Head y = 10.
-        // Total usable height ~ 300 units.
-        // Base Y (Empty) should be y=310 (Feet level).
-        // Full Y (Full) should be y=10 (Head level).
         const startY = 310;
         const maxFluidHeight = 300;
 
@@ -1309,23 +1327,97 @@ class UIManager {
         // Store for Tooltip separate logic
         this.lastNet = net;
 
-
-        // Add Interaction
-        if (svgContainer) {
-            svgContainer.onmouseenter = () => {
-                this.showNotification(`Current Net: ${Math.round(net)} kcal`, 'info');
-            };
+        // --- Interaction & Heatmap ---
+        if (!this.muscleInitialized) {
+            this.initMuscleInteractions();
+            this.muscleInitialized = true;
         }
 
-        // Update Labels based on Day
-        this.updateHoloLabelsNew();
+        if (this.app.userProfile.muscleHeat) {
+            this.updateHeatmap(this.app.userProfile.muscleHeat);
+        }
+
+        // --- Refined Hover Logic (4s/4s) ---
+        if (svgContainer && !svgContainer.dataset.refined) {
+            svgContainer.dataset.refined = "true";
+
+            svgContainer.onmouseenter = () => {
+                svgContainer.classList.add('heatmap-mode');
+                this.updateHoloLabelsNew('schedule'); // Show Schedule initially
+
+                this.hoverTimer = setTimeout(() => {
+                    this.updateHoloLabelsNew('stats'); // Switch to Stats after 4s
+                }, 4000);
+            };
+
+            svgContainer.onmouseleave = () => {
+                svgContainer.classList.remove('heatmap-mode');
+                if (this.hoverTimer) clearTimeout(this.hoverTimer);
+                this.updateHoloLabelsNew('reset'); // Returns to only today's schedule
+            };
+        }
 
         // Update Vital Stats HUD (Phase 7)
         if (this.app && this.app.userProfile) {
             this.renderBodyHUD(this.app.userProfile);
         } else {
-            // Fallback if app structure differs slightly or init order
             this.renderBodyHUD({});
+        }
+    }
+
+    updateHeatmap(muscleHeat) {
+        const groups = document.querySelectorAll('.muscle-group');
+        groups.forEach(group => {
+            const muscle = group.dataset.muscle;
+            const intensity = muscleHeat[muscle] || 0;
+
+            if (intensity > 0) {
+                group.classList.add('active-heat');
+                const blur = (intensity / 100) * 12;
+                const opacity = 0.1 + (intensity / 100) * 0.5;
+
+                group.style.setProperty('--heat-blur', `${blur}px`);
+                group.style.setProperty('--heat-glow', `rgba(255, 79, 79, ${intensity / 100})`);
+                group.style.setProperty('--heat-color', `rgba(255, 79, 79, ${opacity})`);
+            } else {
+                group.classList.remove('active-heat');
+                group.style.removeProperty('--heat-color');
+                group.style.setProperty('--heat-blur', '0px');
+            }
+        });
+    }
+
+    initMuscleInteractions() {
+        const groups = document.querySelectorAll('.muscle-group');
+        groups.forEach(group => {
+            group.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const muscle = group.dataset.muscle;
+                this.showMuscleQuickLog(muscle);
+            });
+        });
+    }
+
+    showMuscleQuickLog(muscle) {
+        const modal = document.getElementById('log-workout-modal');
+        if (modal) {
+            // Pre-fill muscle data and open existing modal
+            const typeInput = document.getElementById('workout-type');
+            if (typeInput) typeInput.value = `${muscle} Training`;
+
+            // We could also add a custom field or hidden data
+            this.showModal('log-workout-modal');
+            this.showNotification(`Targeting ${muscle} - Ready to log!`, 'info');
+        } else {
+            // Fallback to prompt if modal missing (unlikely but safe)
+            const cals = prompt(`Quick log: How many calories did you burn training ${muscle}?`, "200");
+            if (cals) {
+                this.app.logWorkout({
+                    type: `${muscle} Training`,
+                    targetMuscle: muscle,
+                    calories: parseInt(cals) || 200
+                });
+            }
         }
     }
 
@@ -1577,42 +1669,45 @@ class UIManager {
         }
     }
 
-    updateHoloLabelsNew() {
-        const container = document.getElementById('body-labels');
-        const svgContainer = document.getElementById('holo-body-svg');
+    initMuscleInteractions() {
+        const groups = document.querySelectorAll('.muscle-group');
+        groups.forEach(group => {
+            group.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const muscle = group.dataset.muscle;
+                this.showMuscleQuickLog(muscle);
+            });
 
+            group.addEventListener('mouseenter', () => {
+                this.hoveredMuscle = group.dataset.muscle;
+            });
+        });
+    }
+
+    showMuscleQuickLog(muscle) {
+        const modal = document.getElementById('log-workout-modal');
+        if (modal) {
+            const typeInput = document.getElementById('workout-type');
+            if (typeInput) typeInput.value = `${muscle} Training`;
+            this.showModal('log-workout-modal');
+            this.showNotification(`Targeting ${muscle} - Ready to log!`, 'info');
+        } else {
+            const cals = prompt(`Quick log: How many calories did you burn training ${muscle}?`, "200");
+            if (cals) {
+                this.app.logWorkout({
+                    type: `${muscle} Training`,
+                    targetMuscle: muscle,
+                    calories: parseInt(cals) || 200
+                });
+            }
+        }
+    }
+
+    updateHoloLabelsNew(mode = 'reset') {
+        const container = document.getElementById('body-labels');
         if (!container) return;
 
-        if (svgContainer) {
-            svgContainer.style.pointerEvents = 'all';
-
-            svgContainer.onmouseenter = () => {
-                console.log("Holo-Body Hover: ENTER");
-                this.showNotification(`Current Net: ${Math.round(Math.max(0, this.lastNet || 0))} kcal`, 'info');
-                svgContainer.classList.add('blurred');
-
-                document.querySelectorAll('.holo-label').forEach(el => {
-                    el.classList.remove('hidden');
-                    el.style.opacity = '1';
-                });
-            };
-
-            svgContainer.onmouseleave = () => {
-                console.log("Holo-Body Hover: LEAVE");
-                svgContainer.classList.remove('blurred');
-
-                const currentDay = new Date().getDay();
-                document.querySelectorAll('.holo-label').forEach(el => {
-                    if (parseInt(el.dataset.day) !== currentDay) {
-                        el.classList.add('hidden');
-                        el.style.opacity = '0';
-                    }
-                });
-            };
-        }
-
         container.innerHTML = '';
-
         const date = new Date();
         const currentDay = date.getDay();
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -1627,29 +1722,61 @@ class UIManager {
             6: { text: "Leg Day", pos: { top: "60%", left: "80%" }, align: "left" }
         };
 
-        for (let i = 0; i < 7; i++) {
-            const config = schedule[i];
-            const isToday = (i === currentDay);
+        if (mode === 'schedule') {
+            for (let i = 0; i < 7; i++) {
+                const config = schedule[i];
+                container.appendChild(this.createHoloLabel(`${days[i]}: ${config.text}`, config.pos, config.align));
+            }
+        } else if (mode === 'stats') {
+            const muscleStats = {
+                'Chest': { pos: { top: "15%", left: "85%" }, align: "left", icon: "fa-shield-halved" },
+                'Shoulders': { pos: { top: "30%", left: "85%" }, align: "left", icon: "fa-arrows-to-dot" },
+                'Arms': { pos: { top: "45%", left: "85%" }, align: "left", icon: "fa-dumbbell" },
+                'Abs': { pos: { top: "15%", left: "15%" }, align: "right", icon: "fa-fire" },
+                'Back': { pos: { top: "35%", left: "15%" }, align: "right", icon: "fa-dna" },
+                'Legs': { pos: { top: "65%", left: "15%" }, align: "right", icon: "fa-person-running" }
+            };
 
-            const el = document.createElement('div');
-            el.className = `holo-label ${isToday ? 'active' : 'hidden'}`;
-            el.dataset.day = i;
-            el.style.top = config.pos.top;
-            el.style.left = config.pos.left;
-            el.style.transform = 'translate(-50%, -50%)';
-            el.style.opacity = isToday ? '1' : '0';
 
-            let flexDir = 'row';
-            if (config.align === 'right') flexDir = 'row-reverse';
-            if (config.align === 'center') flexDir = 'column';
-            el.style.flexDirection = flexDir;
+            Object.entries(muscleStats).forEach(([muscle, config]) => {
+                const heat = this.app.userProfile.muscleHeat ? (this.app.userProfile.muscleHeat[muscle] || 0) : 0;
+                const isTarget = (this.hoveredMuscle === muscle);
+                const color = isTarget ? '#f43f5e' : '#fb7185';
+                const text = isTarget ? `🔥 ${muscle}: ${Math.round(heat)}% Intensity` : `${muscle}: ${Math.round(heat)}%`;
 
-            el.innerHTML = `
-                <div class="dot" style="width:8px; height:8px; background:#4facfe; border-radius:50%; box-shadow:0 0 10px #4facfe;"></div>
-                <span style="margin: 0 10px;">${days[i]}: ${config.text}</span>
-            `;
-
-            container.appendChild(el);
+                const el = this.createHoloLabel(text, config.pos, config.align, color, config.icon);
+                if (isTarget) el.classList.add('active-stat');
+                container.appendChild(el);
+            });
+        } else {
+            const config = schedule[currentDay];
+            container.appendChild(this.createHoloLabel(`${days[currentDay]}: ${config.text}`, config.pos, config.align));
         }
+    }
+
+    createHoloLabel(text, pos, align, color = '#4facfe', icon = null) {
+        const el = document.createElement('div');
+        el.className = 'holo-label';
+        el.style.top = pos.top;
+        el.style.left = pos.left;
+        el.style.transform = 'translate(-50%, -50%)';
+
+        let flexDir = 'row';
+        if (align === 'right') flexDir = 'row-reverse';
+        if (align === 'center') flexDir = 'column';
+        el.style.flexDirection = flexDir;
+
+        const iconHtml = icon ? `<i class="fa-solid ${icon}" style="color: ${color};"></i>` : '';
+
+        // The entire label is now a single pill-shaped card
+        el.innerHTML = `
+            <div class="pill-content">
+                <div class="status-dot" style="background:${color}; box-shadow:0 0 10px ${color};"></div>
+                ${iconHtml}
+                <span class="label-text">${text}</span>
+            </div>
+            <div class="glow-edge" style="background:${color};"></div>
+        `;
+        return el;
     }
 }

@@ -13,6 +13,8 @@ class App {
         this.charts = new ChartManager(this);
         this.live = new LiveWorkoutManager(this);
         this.fasting = new FastingManager(this);
+        this.voice = new VoiceAssistant(this);
+        this.recovery = new RecoveryManager(this);
 
         this.init();
     }
@@ -29,6 +31,20 @@ class App {
         // Charts & Dashboard will update after login
     }
 
+    _switchAuthTab(tabName) {
+        const tabs = document.querySelectorAll('.auth-tab');
+        const views = document.querySelectorAll('.auth-view');
+
+        tabs.forEach(t => t.classList.remove('active'));
+        views.forEach(v => v.classList.remove('active'));
+
+        const targetTab = document.querySelector(`.auth-tab[data-tab="${tabName}"]`);
+        const targetView = document.getElementById(`auth-${tabName}`);
+
+        if (targetTab) targetTab.classList.add('active');
+        if (targetView) targetView.classList.add('active');
+    }
+
     showLoginScreen() {
         const screen = document.getElementById('login-screen');
         const loginForm = document.getElementById('login-form');
@@ -38,15 +54,10 @@ class App {
 
         // Tab Switching Logic
         tabs.forEach(tab => {
-            tab.onclick = () => {
-                // UI Toggle
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-
-                // Content Toggle
-                document.querySelectorAll('.auth-view').forEach(v => v.classList.remove('active'));
-                document.getElementById(`auth-${tab.dataset.tab}`).classList.add('active');
-            }
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                this._switchAuthTab(tab.dataset.tab);
+            });
         });
 
         // Mobile Menu Logic
@@ -87,16 +98,24 @@ class App {
         });
 
         // 1. Manual Login Logic
-        loginForm.onsubmit = (e) => {
+        loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const username = loginInput.value.trim();
-            const password = document.getElementById('login-password').value.trim();
+            try {
+                const username = loginInput.value.trim();
+                const password = document.getElementById('login-password').value.trim();
 
-            if (username && password) {
-                if (this.auth.login(username, password)) {
-                    this.login(username);
-                } else {
-                    this.ui.showNotification('Invalid Credentials! Try "user123" for User 1.', 'error');
+                if (username && password) {
+                    // Specific feedback logic
+                    if (!this.auth.users[username]) {
+                        this.ui.showNotification('Account not found! Please sign up first.', 'error');
+                    } else if (!this.auth.login(username, password)) {
+                        this.ui.showNotification('Incorrect password! Please try again.', 'error');
+                    } else {
+                        this.login(username);
+                        return;
+                    }
+
+                    // Error UI
                     loginInput.classList.add('error-shake');
                     document.getElementById('login-password').classList.add('error-shake');
                     setTimeout(() => {
@@ -104,32 +123,49 @@ class App {
                         document.getElementById('login-password').classList.remove('error-shake');
                     }, 500);
                 }
+            } catch (err) {
+                console.error("Login Error:", err);
             }
-        };
+        });
 
         // 2. Enhanced Registration Logic
-        signupForm.onsubmit = (e) => {
+        signupForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const username = document.getElementById('reg-username').value.trim();
-            const password = document.getElementById('reg-password').value.trim();
-            const weight = document.getElementById('reg-weight').value;
-            const goal = document.getElementById('reg-goal').value;
+            try {
+                const username = document.getElementById('reg-username').value.trim();
+                const password = document.getElementById('reg-password').value.trim();
+                const weight = document.getElementById('reg-weight').value;
+                const goal = document.getElementById('reg-goal').value;
 
-            if (username && password && weight && goal) {
-                if (this.auth.createUser(username, password)) {
-                    // Initialize Profile
-                    this.auth.login(username, password); // Set prefix
+                if (username && password && weight && goal) {
+                    if (this.auth.createUser(username, password)) {
+                        console.log("Signup success: " + username);
 
-                    const profile = { goals: { calories: parseInt(goal), weight: parseInt(weight) } };
-                    this.storage.save('userProfile', profile);
+                        // Initialize Profile context
+                        this.storage.setPrefix(username);
+                        const profile = { goals: { calories: parseInt(goal), weight: parseInt(weight) } };
+                        this.storage.save('userProfile', profile);
+                        this.storage.setPrefix('guest'); // Reset to default
 
-                    this.ui.showNotification('Account created successfully!', 'success');
-                    this.login(username);
-                } else {
-                    this.ui.showNotification('Username already taken!', 'error');
+                        this.ui.showNotification('Account created successfully! Please sign in.', 'success');
+
+                        // Force Redirection
+                        this._switchAuthTab('login');
+
+                        // Pre-fill Username
+                        loginInput.value = username;
+                        document.getElementById('login-password').focus();
+
+                        // Reset Signup Form
+                        signupForm.reset();
+                    } else {
+                        this.ui.showNotification('Username already taken!', 'error');
+                    }
                 }
+            } catch (err) {
+                console.error("Signup Error:", err);
             }
-        };
+        });
 
         screen.classList.remove('hidden');
     }
@@ -347,8 +383,27 @@ class App {
         this.userProfile.level = this.userProfile.level || 1;
         this.userProfile.xp = this.userProfile.xp || 0;
         this.userProfile.streak = this.userProfile.streak || 0;
+        this.userProfile.zenTotalMinutes = this.userProfile.zenTotalMinutes || 0;
+        this.userProfile.zenTotalSeconds = this.userProfile.zenTotalSeconds || 0;
+        this.userProfile.muscleHeat = this.userProfile.muscleHeat || {
+            Chest: 0, Abs: 0, Arms: 0, Legs: 0, Back: 0, Shoulders: 0
+        };
         this.userProfile.lastLogDate = this.userProfile.lastLogDate || "";
         this.userProfile.history = this.userProfile.history || [];
+
+        // --- Muscle Heat Decay Logic ---
+        const lastDecay = this.userProfile.lastDecayDate;
+        const now = new Date();
+        if (lastDecay) {
+            const daysPassed = Math.floor((now - new Date(lastDecay)) / (1000 * 60 * 60 * 24));
+            if (daysPassed > 0) {
+                for (let m in this.userProfile.muscleHeat) {
+                    this.userProfile.muscleHeat[m] *= Math.pow(0.8, daysPassed);
+                    if (this.userProfile.muscleHeat[m] < 1) this.userProfile.muscleHeat[m] = 0;
+                }
+            }
+        }
+        this.userProfile.lastDecayDate = now.toISOString();
 
         // Daily Reset Logic
         const today = new Date().toDateString();
@@ -420,6 +475,9 @@ class App {
         this.ui.updateXPUI(this.userProfile.level || 1, this.userProfile.xp || 0);
         this.ui.updateWaterUI(this.userProfile.water || 0);
         if (this.fasting) this.fasting.loadData(); // Initialize Fasting State
+        if (this.recovery) {
+            setTimeout(() => this.recovery.loadStats(), 200);
+        }
         this.ui.updateStreakUI(this.userProfile.streak || 0);
 
         // Initialize Badges
@@ -450,12 +508,46 @@ class App {
         this.workouts.push(workoutData);
         this.storage.save('workouts', this.workouts);
 
+        // --- Muscle Heat System ---
+        const mapping = {
+            'running': 'Legs', 'cycling': 'Legs', 'walking': 'Legs', 'squats': 'Legs', 'lunges': 'Legs', 'deadlift': 'Legs',
+            'chest': 'Chest', 'pushups': 'Chest', 'bench press': 'Chest', 'chest fly': 'Chest',
+            'abs': 'Abs', 'plank': 'Abs', 'core': 'Abs', 'crunch': 'Abs', 'leg raises': 'Abs', 'pilates': 'Abs', 'yoga': 'Abs',
+            'arms': 'Arms', 'biceps': 'Arms', 'triceps': 'Arms', 'dumbbells': 'Arms', 'bicep curl': 'Arms', 'tricep extension': 'Arms', 'swimming': 'Arms',
+            'back': 'Back', 'pullups': 'Back', 'rows': 'Back',
+            'shoulders': 'Shoulders', 'overhead press': 'Shoulders', 'lateral raise': 'Shoulders',
+            'jumping jacks': 'Legs', 'burpees': 'Chest', 'zumba': 'Legs', 'cardio': 'Legs'
+        };
+        const typeKey = workoutData.type ? workoutData.type.toLowerCase() : '';
+
+        // Find best match in mapping
+        let muscle = workoutData.targetMuscle;
+        if (!muscle) {
+            const foundKey = Object.keys(mapping).find(key => typeKey.includes(key));
+            muscle = foundKey ? mapping[foundKey] : 'Abs';
+        }
+
+        this.addMuscleHeat(muscle, 20);
+
         this.ui.renderWorkout(workoutData);
         this.updateDashboard();
         this.addXP(20);
         this.checkStreak();
         this.checkAchievements();
-        this.ui.showNotification('Workout logged! +20 XP');
+        this.ui.showNotification(`Workout logged: ${workoutData.type}! +20 XP`);
+    }
+
+    addMuscleHeat(muscle, amount = 20) {
+        if (!this.userProfile.muscleHeat) {
+            this.userProfile.muscleHeat = { Chest: 0, Abs: 0, Arms: 0, Legs: 0, Back: 0, Shoulders: 0 };
+        }
+
+        // Ensure muscle name exists in our set
+        if (this.userProfile.muscleHeat.hasOwnProperty(muscle)) {
+            this.userProfile.muscleHeat[muscle] = Math.min(100, (this.userProfile.muscleHeat[muscle] || 0) + amount);
+            this.saveProfile();
+            if (this.ui.updateHeatmap) this.ui.updateHeatmap(this.userProfile.muscleHeat);
+        }
     }
 
     // --- Stats Updates ---
@@ -586,9 +678,9 @@ class App {
         this.checkAchievements();
     }
 
-    removeWater() {
+    removeWater(amount = 250) {
         if (this.userProfile.water > 0) {
-            this.userProfile.water = Math.max(0, this.userProfile.water - 250);
+            this.userProfile.water = Math.max(0, this.userProfile.water - amount);
             this.saveProfile();
             this.ui.updateWaterUI(this.userProfile.water);
         }
