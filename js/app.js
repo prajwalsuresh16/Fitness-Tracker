@@ -405,6 +405,23 @@ class App {
         }
         this.userProfile.lastDecayDate = now.toISOString();
 
+        // Streak Validation (Reset if missed yesterday)
+        const lastLogForStreak = this.userProfile.lastLogDate;
+        if (lastLogForStreak) {
+            const d1 = new Date();
+            const d2 = new Date(lastLogForStreak);
+            d1.setHours(0, 0, 0, 0);
+            d2.setHours(0, 0, 0, 0);
+            // Calculate difference in days
+            const diffTimeStreak = Math.abs(d1 - d2);
+            const diffDaysStreak = Math.ceil(diffTimeStreak / (1000 * 60 * 60 * 24));
+
+            if (diffDaysStreak > 1) {
+                console.log(`Streak broken! Last log: ${lastLogForStreak}, Days missed: ${diffDaysStreak}`);
+                this.userProfile.streak = 0;
+            }
+        }
+
         // Daily Reset Logic
         const today = new Date().toDateString();
         if (this.userProfile.lastWaterDate !== today) {

@@ -38,6 +38,26 @@
     --border-timeline: rgba(255, 255, 255, 0.05);
 }
 
+/* Sidebar Backdrop */
+.sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+body.sidebar-open .sidebar-backdrop {
+    opacity: 1;
+    pointer-events: all;
+}
+
 [data-theme="light"] {
     --bg-body: #f1f5f9;
     --bg-sidebar: #ffffff;
@@ -122,11 +142,23 @@ section {
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    padding: 1.5rem;
+    padding: 1rem 1.25rem;
     position: fixed;
     height: 100vh;
-    transition: transform 0.3s ease;
-    z-index: 100;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+}
+
+/* Mobile Sidebar Logic */
+@media (max-width: 1024px) {
+    .sidebar {
+        transform: translateX(-100%);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
 }
 
 .logo {
@@ -136,7 +168,7 @@ section {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--primary);
-    margin-bottom: 3rem;
+    margin-bottom: 1.5rem;
 }
 
 .nav-links {
@@ -148,12 +180,12 @@ section {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0.875rem 1rem;
+    padding: 0.75rem 1rem;
     color: var(--text-secondary);
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
 }
 
 .nav-links li:hover,
@@ -192,6 +224,16 @@ section {
     margin-left: var(--sidebar-width);
     padding: 2rem;
     width: calc(100% - var(--sidebar-width));
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+@media (max-width: 1024px) {
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 1rem;
+        /* Reduced padding for mobile */
+    }
 }
 
 .top-bar {
@@ -200,6 +242,24 @@ section {
     align-items: center;
     margin-bottom: 2rem;
     height: var(--header-height);
+    gap: 1rem;
+}
+
+/* Mobile Menu Button */
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .mobile-only {
+        display: block;
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
 }
 
 .user-profile {
@@ -350,6 +410,7 @@ section {
     line-height: 1;
     background: linear-gradient(to bottom, #fff, #94a3b8);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -376,6 +437,7 @@ section {
     margin-bottom: 1rem;
     background: var(--gradient-primary);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -390,6 +452,7 @@ section {
 .focus-card.water .focus-stats .big-value {
     background: linear-gradient(to bottom, #fff, #60a5fa);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -410,6 +473,7 @@ section {
 .focus-card.fire #focus-suggestion-title {
     background: linear-gradient(90deg, var(--accent-fire), #fff);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -421,6 +485,7 @@ section {
 .focus-card.apple #focus-suggestion-title {
     background: linear-gradient(90deg, var(--accent-apple), #fff);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -432,6 +497,7 @@ section {
 .focus-card.balance #focus-suggestion-title {
     background: linear-gradient(90deg, var(--accent-blue), #fff);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -648,6 +714,28 @@ section {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+/* Hydration Card Specific Layout */
+.water-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: inherit;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.water-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 2;
+    width: 100%;
 }
 
 .info h3 {
@@ -2815,6 +2903,15 @@ to {
     display: flex;
     gap: 1rem;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
+    /* Safety for small screens */
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 }
 
 .form-row .form-group {
@@ -5148,8 +5245,9 @@ canvas {
 .zen-icon-main {
     font-size: 3rem;
     margin-bottom: 1.5rem;
-    background: linear-gradient(135deg, #a855f7, #ec4899);
+    background: linear-gradient(135deg, #10b981, #34d399);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
 }
@@ -5367,5 +5465,292 @@ canvas {
     .zen-info-pane {
         flex: 1;
         width: 100%;
+    }
+}
+
+/* =========================================
+   Mobile First Responsive Overrides
+   ========================================= */
+
+@media (max-width: 768px) {
+
+    /* --- Summary Cards --- */
+    .summary-grid {
+        grid-template-columns: 1fr;
+        /* Stack cards */
+        gap: 1rem;
+    }
+
+    /* --- Charts --- */
+    .charts-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .chart-card {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* --- Profile & Settings --- */
+    .profile-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .input-group.full-width {
+        grid-column: span 1;
+    }
+
+    /* --- Nutrition Hero --- */
+    .nutrition-hero {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .macro-overview {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .macro-ring-container {
+        justify-content: center;
+    }
+
+    /* --- Workout Hero --- */
+    .workout-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .workout-stats-row {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .hero-action {
+        width: 100%;
+    }
+
+    .hero-action button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* --- Typography & Spacing --- */
+    h1#page-title {
+        font-size: 1.5rem;
+    }
+
+    .section-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .card {
+        padding: 1rem;
+    }
+
+    /* --- Modals --- */
+    .modal-content {
+        margin: 5% auto;
+        width: 95%;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-bar {
+        flex-wrap: wrap;
+        height: auto;
+        gap: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    .user-profile {
+        width: auto;
+    }
+
+    #page-title {
+        order: 1;
+        width: 100%;
+        text-align: center;
+        margin-top: 0.5rem;
+    }
+
+    .mobile-only {
+        order: 0;
+    }
+
+    .user-profile {
+        order: 0;
+    }
+
+}
+
+/* =========================================
+   Mobile First Refinements & Aesthetics
+   ========================================= */
+
+@media (max-width: 768px) {
+
+    /* --- Global Touch Optimization --- */
+    button,
+    input,
+    select,
+    .nav-links li,
+    .summary-card {
+        min-height: 44px;
+        /* Accessible touch target */
+        touch-action: manipulation;
+    }
+
+    /* --- Workouts --- */
+    .active-workout-card {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .active-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .active-stats {
+        width: 100%;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    /* --- Hydration --- */
+    .hydration-main-card {
+        padding: 1.5rem;
+        width: 100%;
+    }
+
+    .hydration-actions {
+        gap: 0.5rem;
+    }
+
+    .circle-progress-container {
+        width: 160px;
+        height: 160px;
+    }
+
+    .progress-ring__circle {
+        stroke-dasharray: 440;
+        /* Adjusted for smaller radius if needed via JS, but SVG scales */
+        /* Note: SVG viewBox handles scaling, but container size matters */
+    }
+
+    /* --- Fasting --- */
+    .timer-circle-wrapper {
+        width: 260px;
+        height: 260px;
+    }
+
+    /* --- Body Status --- */
+    .hud-panel {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    /* --- Recovery --- */
+    .zen-layout {
+        gap: 2rem;
+    }
+
+    .rhythm-chips {
+        gap: 0.5rem;
+    }
+
+    .rhythm-chip {
+        padding: 0.6rem 1.2rem;
+        flex: 1 1 auto;
+        text-align: center;
+    }
+
+    /* --- Settings & Profile --- */
+    .profile-grid {
+        gap: 1.5rem;
+    }
+
+    /* --- Body Tracker (Holo-Body) --- */
+    #body-tracker .holo-container {
+        flex-direction: column;
+        height: auto !important;
+        padding: 2rem 0;
+    }
+
+    #body-tracker svg {
+        width: 100%;
+        height: auto;
+        max-height: 500px;
+    }
+
+    .hud-panel {
+        position: relative !important;
+        width: 100% !important;
+        transform: none !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
+        margin-top: 1rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .hud-item {
+        margin-bottom: 0;
+    }
+
+    /* --- Recovery (Zen Mode) --- */
+    .zen-layout {
+        flex-direction: column !important;
+        gap: 2rem;
+    }
+
+    .zen-visual {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .water-glass-container {
+        transform: scale(0.8);
+    }
+
+    /* --- Settings Wide Cards --- */
+    .chart-card-wide {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+}
+
+/* Remove hover effects on touch devices to prevent sticky active states */
+@media (hover: none) {
+    .summary-card:hover {
+        transform: none;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .nav-links li:hover:not(.active) {
+        background-color: transparent;
+        color: var(--text-secondary);
     }
 }

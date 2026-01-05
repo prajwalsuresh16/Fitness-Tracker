@@ -606,7 +606,7 @@
                     </div>
 
                     <div class="holo-container"
-                        style="position:relative; height:600px; display:flex; justify-content:center; align-items:center;">
+                        style="position:relative; min-height:600px; height:auto; display:flex; justify-content:center; align-items:center; width: 100%;">
 
                         <!-- Edit Bio-Core Button (Phase 9) -->
                         <button id="btn-edit-bio" class="action-btn" title="Update Bio-Metrics"
@@ -615,8 +615,8 @@
                         </button>
 
                         <!-- 3D Glass Mannequin SVG -->
-                        <svg width="300" height="550" viewBox="0 0 200 400" id="holo-body-svg"
-                            style="filter: drop-shadow(0 0 20px rgba(79, 172, 254, 0.4));">
+                        <svg width="100%" height="auto" viewBox="0 0 200 400" id="holo-body-svg"
+                            style="max-width: 300px; max-height: 550px; filter: drop-shadow(0 0 20px rgba(79, 172, 254, 0.4));">
                             <defs>
                                 <!-- Glossy Glass Gradient -->
                                 <linearGradient id="glass-grad" x1="0%" y1="0%" x2="100%" y2="100%">
