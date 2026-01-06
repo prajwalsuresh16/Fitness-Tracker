@@ -496,6 +496,10 @@ class UIManager {
             icon = 'fa-exclamation-circle';
             title = 'Error';
             toast.style.borderColor = 'var(--accent-fire)';
+        } else if (type === 'override') {
+            icon = 'fa-fire-flame-curved';
+            title = 'System Override';
+            toast.classList.add('override-toast');
         }
 
         toast.innerHTML = `
@@ -1366,6 +1370,7 @@ class UIManager {
     }
 
     updateHeatmap(muscleHeat) {
+        if (!muscleHeat) return;
         const groups = document.querySelectorAll('.muscle-group');
         groups.forEach(group => {
             const muscle = group.dataset.muscle;
@@ -1382,6 +1387,7 @@ class UIManager {
             } else {
                 group.classList.remove('active-heat');
                 group.style.removeProperty('--heat-color');
+                group.style.removeProperty('--heat-glow');
                 group.style.setProperty('--heat-blur', '0px');
             }
         });
@@ -1667,6 +1673,21 @@ class UIManager {
                 panels.forEach(p => p.classList.add('hidden-panel'));
             });
         }
+
+        // Reset Button Logic
+        this.initMuscleResetButton();
+    }
+
+    initMuscleResetButton() {
+        const resetBtn = document.getElementById('btn-reset-heat');
+        if (resetBtn && !resetBtn.dataset.listening) {
+            resetBtn.dataset.listening = "true";
+            resetBtn.addEventListener('click', () => {
+                // Removed browser confirm alert as per user request
+                this.app.resetMuscleHeat();
+                this.showNotification("Muscle Heatmap Deactivated", "override");
+            });
+        }
     }
 
     initMuscleInteractions() {
@@ -1680,6 +1701,18 @@ class UIManager {
 
             group.addEventListener('mouseenter', () => {
                 this.hoveredMuscle = group.dataset.muscle;
+                // Immediate update if in stats mode
+                if (document.getElementById('holo-body-svg').classList.contains('heatmap-mode')) {
+                    this.updateHoloLabelsNew('stats');
+                }
+            });
+
+            group.addEventListener('mouseleave', () => {
+                this.hoveredMuscle = null;
+                // Immediate update to clear highlight
+                if (document.getElementById('holo-body-svg').classList.contains('heatmap-mode')) {
+                    this.updateHoloLabelsNew('stats');
+                }
             });
         });
     }
@@ -1741,8 +1774,15 @@ class UIManager {
             Object.entries(muscleStats).forEach(([muscle, config]) => {
                 const heat = this.app.userProfile.muscleHeat ? (this.app.userProfile.muscleHeat[muscle] || 0) : 0;
                 const isTarget = (this.hoveredMuscle === muscle);
-                const color = isTarget ? '#f43f5e' : '#fb7185';
-                const text = isTarget ? `🔥 ${muscle}: ${Math.round(heat)}% Intensity` : `${muscle}: ${Math.round(heat)}%`;
+
+                // Refined Color Logic: Blue/Cyan for 0%, Red/Rose for > 0%
+                let color = '#4facfe'; // Default Blue
+                if (heat > 0) color = isTarget ? '#f43f5e' : '#fb7185';
+                else if (isTarget) color = '#00f2fe'; // Bright Cyan for targeted 0%
+
+                const fire = (heat > 0) ? '🔥 ' : '';
+                const intensityText = isTarget ? ' Intensity' : '';
+                const text = `${fire}${muscle}: ${Math.round(heat)}%${intensityText}`;
 
                 const el = this.createHoloLabel(text, config.pos, config.align, color, config.icon);
                 if (isTarget) el.classList.add('active-stat');

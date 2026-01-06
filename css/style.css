@@ -2108,6 +2108,29 @@ to {
     animation: toastSlideOut 0.4s ease-in forwards;
 }
 
+/* --- System Override Notification (Holographic) --- */
+.notification-toast.override-toast {
+    border-color: #00f2fe;
+    background: rgba(15, 23, 42, 0.95);
+    box-shadow: 0 8px 32px rgba(0, 242, 254, 0.2), inset 0 0 15px rgba(0, 242, 254, 0.1);
+}
+
+.notification-toast.override-toast .icon {
+    background: rgba(0, 242, 254, 0.1);
+    color: #00f2fe;
+    text-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+}
+
+.notification-toast.override-toast h4 {
+    color: #4facfe;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.notification-toast.override-toast::before {
+    background: linear-gradient(to bottom, #4facfe, #00f2fe);
+}
+
 @keyframes slideUpFade {
     from {
         opacity: 0;

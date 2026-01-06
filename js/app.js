@@ -275,15 +275,28 @@ class App {
     }
 
     startDataObserver() {
-        // Runs every 1s to ensure UI matches Data
+        // Runs every 1s to ensure UI matches Data and check for Daily Resets
         setInterval(() => {
             if (!this.userProfile || !this.workouts) return;
 
-            // Check if we have data but UI says 0
+            // 1. Midnight Reset Check
+            const today = new Date().toDateString();
+            if (this.userProfile.lastWaterDate && this.userProfile.lastWaterDate !== today) {
+                console.log("Observer: Midnight detected. Triggering daily reset...");
+                this.resetMuscleHeat(); // Explicitly reset muscles
+                this.loadData(); // Re-running loadData handles archiving and resetting everything else
+            }
+
+            // 2. Dashboard Desync Check (Today's Calories)
             const burntEl = document.getElementById('dash-burned');
             if (burntEl) {
                 const uiVal = parseInt(burntEl.textContent) || 0;
-                const actualVal = this.workouts.reduce((sum, w) => sum + w.calories, 0);
+
+                // Get today's actual calories
+                const todayStr = new Date().toDateString();
+                const actualVal = this.workouts
+                    .filter(w => new Date(w.timestamp).toDateString() === todayStr)
+                    .reduce((sum, w) => sum + w.calories, 0);
 
                 if (actualVal > 0 && uiVal === 0) {
                     console.log("Observer: UI desync detected (UI: 0, Data: " + actualVal + "). Forcing update.");
@@ -438,6 +451,10 @@ class App {
 
             this.userProfile.water = 0;
             this.userProfile.waterGoalMet = false;
+
+            // Updated: Use central reset method
+            this.resetMuscleHeat();
+
             this.userProfile.lastWaterDate = today;
             this.saveProfile(); // Persist reset
         }
@@ -564,6 +581,17 @@ class App {
             this.userProfile.muscleHeat[muscle] = Math.min(100, (this.userProfile.muscleHeat[muscle] || 0) + amount);
             this.saveProfile();
             if (this.ui.updateHeatmap) this.ui.updateHeatmap(this.userProfile.muscleHeat);
+        }
+    }
+
+    resetMuscleHeat() {
+        console.log("App: Resetting all muscle heat...");
+        this.userProfile.muscleHeat = {
+            Chest: 0, Abs: 0, Arms: 0, Legs: 0, Back: 0, Shoulders: 0
+        };
+        this.saveProfile();
+        if (this.ui && this.ui.updateHeatmap) {
+            this.ui.updateHeatmap(this.userProfile.muscleHeat);
         }
     }
 

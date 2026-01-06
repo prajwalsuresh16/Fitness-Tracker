@@ -608,11 +608,17 @@
                     <div class="holo-container"
                         style="position:relative; min-height:600px; height:auto; display:flex; justify-content:center; align-items:center; width: 100%;">
 
-                        <!-- Edit Bio-Core Button (Phase 9) -->
-                        <button id="btn-edit-bio" class="action-btn" title="Update Bio-Metrics"
-                            style="position:absolute; top:20px; right:20px; z-index:101; background:rgba(15, 23, 42, 0.8); border:1px solid #4facfe; border-radius:50%; width:40px; height:40px; color:#fff; cursor:pointer; box-shadow:0 0 10px rgba(79, 172, 254, 0.3); display:flex; justify-content:center; align-items:center; transition:all 0.3s ease;">
-                            <i class="fa-solid fa-sliders"></i>
-                        </button>
+                        <!-- Body Status Controls (Phase 9) -->
+                        <div class="holo-controls" style="position:absolute; top:20px; right:20px; z-index:101; display:flex; gap:10px;">
+                            <button id="btn-reset-heat" class="action-btn" title="Reset Heatmap" 
+                                style="background:rgba(15, 23, 42, 0.8); border:1px solid #f43f5e; border-radius:50%; width:40px; height:40px; color:#fff; cursor:pointer; box-shadow:0 0 10px rgba(244, 63, 94, 0.3); display:flex; justify-content:center; align-items:center; transition:all 0.3s ease;">
+                                <i class="fa-solid fa-fire-flame-curved"></i>
+                            </button>
+                            <button id="btn-edit-bio" class="action-btn" title="Update Bio-Metrics"
+                                style="background:rgba(15, 23, 42, 0.8); border:1px solid #4facfe; border-radius:50%; width:40px; height:40px; color:#fff; cursor:pointer; box-shadow:0 0 10px rgba(79, 172, 254, 0.3); display:flex; justify-content:center; align-items:center; transition:all 0.3s ease;">
+                                <i class="fa-solid fa-sliders"></i>
+                            </button>
+                        </div>
 
                         <!-- 3D Glass Mannequin SVG -->
                         <svg width="100%" height="auto" viewBox="0 0 200 400" id="holo-body-svg"
